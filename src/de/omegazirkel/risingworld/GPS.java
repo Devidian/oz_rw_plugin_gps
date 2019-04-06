@@ -30,7 +30,7 @@ import net.risingworld.api.utils.Vector3f;
 
 public class GPS extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "1.5.0";
+	static final String pluginVersion = "1.5.1";
 	static final String pluginName = "GPS";
 	static final String pluginCMD = "gps";
 
@@ -54,6 +54,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	static int wpHdgPrecis = 5; // the waypoint radial delta below which route corrections arrows are not
 								// displayed
 
+	public static int wpMaxIndex = 15; // the max waypoint index
 	// END Settings
 
 	// KEYS FOR PLAYER ATTRIBUTES
@@ -69,7 +70,6 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	// CONSTANTS
 	static final double RAD2DEG = 180.0 / Math.PI;
 	public static final int HOME_WP = 0; // the index of the home waypoint
-	public static final int MAX_WP = 15; // the max waypoint index
 	public static final int MIN_WP = 0; // the min waypoint index (including home)
 	public static final int MIN_WP_PROPER = 1; // the min waypoint index (EXCLUDING home)
 	public static final int TARGET_ID = -1; // the wp ID common to all targets
@@ -153,7 +153,8 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 				player.sendTextMessage(c.okay + pluginName + ":> " + infoMessage);
 				break;
 			case "help":
-				String helpMessage = t.get("CMD_HELP", lang)
+				String helpMessage = t.get("CMD_HELP", lang).replace("PH_CMD_SETHOME", c.command + "/sethome" + c.text)
+						.replace("PH_CMD_TPHOME", c.command + "/home" + c.text)
 						.replace("PH_CMD_GUI", c.command + "/" + pluginCMD + c.text)
 						.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text)
 						.replace("PH_CMD_INFO", c.command + "/" + pluginCMD + " info" + c.text)
@@ -193,13 +194,13 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	 * @param player
 	 */
 	private void loadPlayer(Player player) {
-		Waypoint waypoints[] = new Waypoint[GPS.MAX_WP + 1];
+		Waypoint waypoints[] = new Waypoint[GPS.wpMaxIndex + 1];
 		player.setAttribute(GPS.key_gpsWpList, waypoints);
 		try (ResultSet result = db.executeQuery(
 				"SELECT * FROM `waypoints` WHERE `player_id` = '" + player.getDbID() + "' ORDER BY `wp_id`;")) {
 			while (result.next()) {
 				int wpIdx = result.getInt("wp_id");
-				if (wpIdx < GPS.MIN_WP || wpIdx >= GPS.MAX_WP)
+				if (wpIdx < GPS.MIN_WP || wpIdx >= GPS.wpMaxIndex)
 					continue;
 				waypoints[result.getInt("wp_id")] = new Waypoint(result.getInt("wp_id"), result.getString("wp_name"),
 						result.getFloat("wp_x"), result.getFloat("wp_y"), result.getFloat("wp_z"));
@@ -231,7 +232,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	 * @param wpName
 	 */
 	public void setWp(Player player, int wpIdx, Vector3f pos, String wpName) {
-		if (wpIdx < GPS.MIN_WP || wpIdx > GPS.MAX_WP) {
+		if (wpIdx < GPS.MIN_WP || wpIdx > GPS.wpMaxIndex) {
 			return;
 		}
 		int playerId = player.getDbID();
@@ -254,9 +255,9 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 
 	public void deleteWp(Player player, int wpIdx) {
 		String lang = player.getSystemLanguage();
-		if (wpIdx < GPS.MIN_WP || wpIdx >= GPS.MAX_WP) {
+		if (wpIdx < GPS.MIN_WP || wpIdx >= GPS.wpMaxIndex) {
 			player.sendTextMessage(c.error + pluginName + ":> " + c.text
-					+ t.get("GPS_001", lang).replace("PH_MIN", MIN_WP + "").replace("PH_MAX", MAX_WP + ""));
+					+ t.get("GPS_001", lang).replace("PH_MIN", MIN_WP + "").replace("PH_MAX", wpMaxIndex + ""));
 			return;
 		}
 		int playerId = player.getDbID();
@@ -313,9 +314,9 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	public void setShowWp(Player player, Integer index) {
 		String lang = player.getSystemLanguage();
 		// check index is there and is legal
-		if (index == null || index < TARGET_ID || index > MAX_WP) {
+		if (index == null || index < TARGET_ID || index > wpMaxIndex) {
 			player.sendTextMessage(c.error + pluginName + ":> " + c.text
-					+ t.get("GPS_001", lang).replace("PH_MIN", MIN_WP + "").replace("PH_MAX", MAX_WP + ""));
+					+ t.get("GPS_001", lang).replace("PH_MIN", MIN_WP + "").replace("PH_MAX", wpMaxIndex + ""));
 			return;
 		}
 		// if not turning off (index = 0), check that waypoint exists
@@ -359,9 +360,9 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	public void teleportToWp(Player player, Integer index) {
 		String lang = player.getSystemLanguage();
 		// check index is there and is legal
-		if (index == null || index < MIN_WP || index > MAX_WP) {
+		if (index == null || index < MIN_WP || index > wpMaxIndex) {
 			player.sendTextMessage(c.error + pluginName + ":> " + c.text
-					+ t.get("GPS_001", lang).replace("PH_MIN", MIN_WP + "").replace("PH_MAX", MAX_WP + ""));
+					+ t.get("GPS_001", lang).replace("PH_MIN", MIN_WP + "").replace("PH_MAX", wpMaxIndex + ""));
 			return;
 		}
 		// check teleporting to waypoint is enabled
@@ -497,7 +498,8 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 			info.setFontColor(0xFFFFFFFF);
 			info.setFontSize(FONT_SIZE);
 			info.setPivot(PivotPosition.Center);
-			GuiLabel hint = new GuiLabel(t.get("GPS_009", lang).replace("PH_CMD", "/"+pluginCMD), gpsXPosDef, gpsHintYPos, true);
+			GuiLabel hint = new GuiLabel(t.get("GPS_009", lang).replace("PH_CMD", "/" + pluginCMD), gpsXPosDef,
+					gpsHintYPos, true);
 			hint.setPivot(PivotPosition.Center);
 			hint.setFontSize(HINT_SIZE);
 			info.addChild(hint);
@@ -533,7 +535,8 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 			gpsYPos = Float.parseFloat(settings.getProperty("gpsYPos", "0.1"));
 			wpDispLen = Integer.parseInt(settings.getProperty("wpDispLength", "8"));
 			wpHdgPrecis = Integer.parseInt(settings.getProperty("wpHdgPrecis", "5"));
-
+			wpMaxIndex = Integer.parseInt(settings.getProperty("wpMaxIndex", "15"));
+			
 			// fill global values
 			logLevel = Integer.parseInt(settings.getProperty("logLevel", "0"));
 			sendPluginWelcome = settings.getProperty("sendPluginWelcome", "false").contentEquals("true");

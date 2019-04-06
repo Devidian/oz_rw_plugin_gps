@@ -39,7 +39,7 @@ class GpsGUI extends GuiDialogueBox {
 	private static final int BUTTPREV_ID = 11;
 	private static final int BUTTNEXT_ID = 12;
 	private static final int NEWWPNAME_ID = 13;
-	private static final int IMPORTWPNAME_ID = 14;
+	// private static final int IMPORTWPNAME_ID = 14;
 
 	private static final int BUTTONOFF_ICN = 0;
 	private static final int BUTTGOTO_ICN = 1;
@@ -145,7 +145,7 @@ class GpsGUI extends GuiDialogueBox {
 		@Override
 		public void onCall(Player player, int id, Object data) {
 			String lang = player.getSystemLanguage();
-			Waypoint[] waypoints = (Waypoint[]) player.getAttribute(Gps.key_gpsWpList);
+			Waypoint[] waypoints = (Waypoint[]) player.getAttribute(GPS.key_gpsWpList);
 			boolean isCurrWpDefined = false;
 			if (waypoints != null)
 				isCurrWpDefined = waypoints[currWp] != null;
@@ -154,7 +154,7 @@ class GpsGUI extends GuiDialogueBox {
 			case RWGui.ABORT_ID:
 				switch (state) {
 				case STATE_NONE:
-					player.setAttribute(Gps.key_gpsGUIcurrWp, currWp);
+					player.setAttribute(GPS.key_gpsGUIcurrWp, currWp);
 					break;
 				case STATE_WPLIST:
 					state = STATE_NONE;
@@ -162,16 +162,16 @@ class GpsGUI extends GuiDialogueBox {
 				}
 				return;
 			case BUTTONOFF_ID:
-				Gps.setGPSShow(player, !(boolean) player.getAttribute(Gps.key_gpsShow));
+				Gps.setGPSShow(player, !(boolean) player.getAttribute(GPS.key_gpsShow));
 				return;
 			case BUTTPREV_ID:
 				currWp--;
 				if (currWp < 0) // wrap to last wp
-					currWp = Gps.MAX_WP;
+					currWp = GPS.wpMaxIndex;
 				break;
 			case BUTTNEXT_ID:
 				currWp++;
-				if (currWp > Gps.MAX_WP) // wrap to first wp
+				if (currWp > GPS.wpMaxIndex) // wrap to first wp
 					currWp = 0;
 				break;
 			case BUTTGOTO_ID:
@@ -195,30 +195,22 @@ class GpsGUI extends GuiDialogueBox {
 						defaultText, NEWWPNAME_ID, this));
 				return;
 			case BUTTWPSHOW_ID:
-				if (currWp != Gps.HOME_WP && isCurrWpDefined)
+				if (currWp != GPS.HOME_WP && isCurrWpDefined)
 					Gps.setShowWp(player, currWp);
 				break;
 			case BUTTWPHIDE_ID:
 				Gps.setShowWp(player, 0);
 				break;
 			case BUTTTARGETSHOW_ID:
-				List<Waypoint> targets = (List<Waypoint>) player.getAttribute(Gps.key_gpsTargetList);
+				List<Waypoint> targets = (List<Waypoint>) player.getAttribute(GPS.key_gpsTargetList);
 				if (targets != null && !targets.isEmpty())
-					Gps.setShowWp(player, Gps.TARGET_ID);
+					Gps.setShowWp(player, GPS.TARGET_ID);
 				break;
-			/*
-			 * GLOBAL WAYPOINT HAVE BEEN REMOVED case BUTTWPIMPORT_ID:
-			 * listGlobalWps(player); return;
-			 */
 			case NEWWPNAME_ID:
 				if (data != null && ((String) data).length() > 0)
 					Gps.setWp(player, currWp, (String) data);
 				break;
-			/*
-			 * GLOBAL WAYPOINT HAVE BEEN REMOVED case IMPORTWPNAME_ID: if (data != null &&
-			 * ((String)data).length() > 0) Db.setWp(player, currWp,
-			 * globalWps[globalWpIdx].pos, (String)data); break;
-			 */
+
 			default:
 				return;
 			}
@@ -226,22 +218,7 @@ class GpsGUI extends GuiDialogueBox {
 		}
 	}
 
-	/*
-	 * GLOBAL WAYPOINT HAVE BEEN REMOVED private class MenuHandler implements
-	 * RWGuiCallback {
-	 * 
-	 * @Override public void onCall(Player player, int id, Object data) { if (id !=
-	 * RWGui.ABORT_ID && globalWps != null && id >=0 && id < globalWps.length) {
-	 * globalWpIdx = id; push(player, new GuiInputDlgBox(plugin, player,
-	 * Msgs.msg[Msgs.txt_wpNameTitle], Msgs.msg[Msgs.txt_wpNameCapt],
-	 * globalWps[globalWpIdx].name, IMPORTWPNAME_ID, dlgHandler)); } } } /* private
-	 * void listGlobalWps(Player player) { globalWps = Db.getGlobalWps(); if
-	 * (globalWps == null || globalWps.length < 1) {
-	 * player.sendTextMessage("No global waypoints found"); return; } GuiMenu wpMenu
-	 * = new GuiMenu(plugin, "Global waypoint to import", new MenuHandler(), true);
-	 * for (int i = 0; i < globalWps.length; i++) wpMenu.addChild(globalWps[i].name,
-	 * i, null); push(player, wpMenu); }
-	 */
+
 	private void updateControls(Player player) {
 		String lang = player.getSystemLanguage();
 		Waypoint[] waypoints = (Waypoint[]) player.getAttribute(Gps.key_gpsWpList);
@@ -263,7 +240,7 @@ class GpsGUI extends GuiDialogueBox {
 			}
 			// set HOME SET and HOME SHOW/HIDE buttons
 			boolean isDef = (waypoints[0] != null); // if HOME defined?
-			boolean isShown = (boolean) player.getAttribute(Gps.key_gpsHomeShow);
+			boolean isShown = (boolean) player.getAttribute(GPS.key_gpsHomeShow);
 			// set HOME SHOW/HIDE text depending on home being currently shown or not
 			buttHomeShow.setImage(isShown ? icons[BUTTHOMEHIDE_ICN] : icons[BUTTHOMESHOW_ICN]);
 			// enable/disable HOME SHOW/HIDE depending on home being defined or not
@@ -283,8 +260,8 @@ class GpsGUI extends GuiDialogueBox {
 		}
 		// Targets: enable/disable TARGET SHOW depending there is some target
 		// and targets are currently not shown
-		List<Waypoint> targets = (List<Waypoint>) player.getAttribute(Gps.key_gpsTargetList);
-		buttTargetShow.setVisible(wpShown != Gps.TARGET_ID && targets != null && !targets.isEmpty());
+		List<Waypoint> targets = (List<Waypoint>) player.getAttribute(GPS.key_gpsTargetList);
+		buttTargetShow.setVisible(wpShown != GPS.TARGET_ID && targets != null && !targets.isEmpty());
 	}
 
 }
