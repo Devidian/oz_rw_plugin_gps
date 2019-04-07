@@ -1,6 +1,8 @@
 package de.omegazirkel.risingworld;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -12,6 +14,7 @@ import java.util.Properties;
 import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.FileChangeListener;
 import de.omegazirkel.risingworld.tools.I18n;
+import de.omegazirkel.risingworld.tools.PluginChangeWatcher;
 import de.omegazirkel.risingworld.tools.db.SQLite;
 import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
@@ -30,7 +33,7 @@ import net.risingworld.api.utils.Vector3f;
 
 public class GPS extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "1.5.1";
+	static final String pluginVersion = "1.6.0-SNAPSHOT";
 	static final String pluginName = "GPS";
 	static final String pluginCMD = "gps";
 
@@ -48,6 +51,8 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	static boolean sendPluginWelcome = false;
 	// GPS
 	static boolean allowTpToWp = false; // whether teleporting to waypoints (in addition to home) is possible or not
+	static boolean allowTpToSpawn = false; // teleporting to player spawn (bed)
+	static boolean allowTpToServerSpawn = false; // teleporting to server default spawn (for new players)
 	static boolean coordNativeFormat = false;
 	static float gpsYPos = 0.1f;
 	static int wpDispLen = 8; // the max length of waypoint names to display on screen
@@ -86,6 +91,16 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 		t = t != null ? t : new I18n(this, logLevel);
 		db = db != null ? db : new SQLite(this, logLevel);
 		initDatabase();
+
+		try {
+			PluginChangeWatcher WU = new PluginChangeWatcher(this);
+			File f = new File(getPath());
+			WU.watchDir(f);
+			WU.startListening();
+		} catch (IOException ex) {
+			log.out(ex.getMessage(), 999);
+		}
+
 		log.out(pluginName + " Plugin is enabled", 10);
 	}
 
@@ -132,11 +147,13 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 		String lang = event.getPlayer().getSystemLanguage();
 		String[] cmd = command.split(" ");
 
-		if (cmd[0].equals("/sethome"))
+		if (cmd[0].equals("/sethome")) {
 			setHome(player);
+		}
 
-		if (cmd[0].equals("/home"))
+		if (cmd[0].equals("/home")) {
 			teleportToWp(player, HOME_WP);
+		}
 
 		if (cmd[0].equals("/" + pluginCMD)) {
 			if (cmd.length < 2) {
@@ -147,7 +164,12 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 
 			String option = cmd[1];
 			switch (option) {
-
+			case "spawn":
+				teleportToPlayerSpawn(player);
+				break;
+			case "serverspawn":
+				teleportToServerSpawn(player);
+				break;
 			case "info":
 				String infoMessage = t.get("CMD_INFO", lang);
 				player.sendTextMessage(c.okay + pluginName + ":> " + infoMessage);
@@ -155,7 +177,8 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 			case "help":
 				String helpMessage = t.get("CMD_HELP", lang).replace("PH_CMD_SETHOME", c.command + "/sethome" + c.text)
 						.replace("PH_CMD_TPHOME", c.command + "/home" + c.text)
-						.replace("PH_CMD_GUI", c.command + "/" + pluginCMD + c.text)
+						.replace("PH_CMD_SPAWN", c.command + "/" + pluginCMD + " spawn" + c.text)
+						.replace("PH_CMD_SRVSPAWN", c.command + "/" + pluginCMD + " serverspawn" + c.text)
 						.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text)
 						.replace("PH_CMD_INFO", c.command + "/" + pluginCMD + " info" + c.text)
 						.replace("PH_CMD_STATUS", c.command + "/" + pluginCMD + " status" + c.text);
@@ -382,6 +405,43 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	}
 
 	/**
+	 * teleport the player to the server default spawn location
+	 * 
+	 * @author Devidian
+	 * @param player
+	 */
+	void teleportToServerSpawn(Player player) {
+		String lang = player.getSystemLanguage();
+		Server server = getServer();
+
+		if (!allowTpToServerSpawn) {
+			player.sendTextMessage(c.error + pluginName + ":> " + c.text + t.get("GPS_TP_DEFAULT_DISABLED", lang));
+			return;
+		}
+
+		player.setPosition(server.getDefaultSpawnPosition());
+		player.sendTextMessage(c.okay + pluginName + ":> " + c.text + t.get("GPS_TP_DEFAULT_OK", lang));
+	}
+
+	/**
+	 * teleport the player to his bed
+	 * 
+	 * @author Devidian
+	 * @param player
+	 */
+	void teleportToPlayerSpawn(Player player) {
+		String lang = player.getSystemLanguage();
+
+		if (!allowTpToSpawn) {
+			player.sendTextMessage(c.error + pluginName + ":> " + c.text + t.get("GPS_TP_SPAWN_DISABLED", lang));
+			return;
+		}
+
+		player.setPosition(player.getRespawnPosition());
+		player.sendTextMessage(c.okay + pluginName + ":> " + c.text + t.get("GPS_TP_SPAWN_OK", lang));
+	}
+
+	/**
 	 * Sets the text of the player GPS data text.
 	 * 
 	 * @param player the affected player
@@ -531,12 +591,14 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 
 			// GPS Stuff
 			allowTpToWp = settings.getProperty("allowTpToWp", "false").contentEquals("true");
+			allowTpToSpawn = settings.getProperty("allowTpToSpawn", "false").contentEquals("true");
+			allowTpToServerSpawn = settings.getProperty("allowTpToServerSpawn", "false").contentEquals("true");
 			coordNativeFormat = settings.getProperty("coordNativeFormat", "false").contentEquals("true");
 			gpsYPos = Float.parseFloat(settings.getProperty("gpsYPos", "0.1"));
 			wpDispLen = Integer.parseInt(settings.getProperty("wpDispLength", "8"));
 			wpHdgPrecis = Integer.parseInt(settings.getProperty("wpHdgPrecis", "5"));
 			wpMaxIndex = Integer.parseInt(settings.getProperty("wpMaxIndex", "15"));
-			
+
 			// fill global values
 			logLevel = Integer.parseInt(settings.getProperty("logLevel", "0"));
 			sendPluginWelcome = settings.getProperty("sendPluginWelcome", "false").contentEquals("true");

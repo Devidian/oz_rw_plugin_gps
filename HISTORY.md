@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [1.6.0] - 2019-04-07
+### Fixed
+- PluginChangeWatcher wurde nicht ausgeführt
+### Added
+- neues Kommando: `/gps spawn` teleportiert zum Bett (Spieler-Spawn)
+- neues Kommando: `/gps serverspawn` teleportiert zum Srver-Startpunkt
+- neue Kommandos können in der `settings.properties` aktiviert werden
+- Russische Übersetzung von `Galochka`
+
 ## [1.5.1] - 2019-04-06
 ### Added
 - In der Hilfe stehen nun auch die Befehle zum setzen und teleportieren zum Startpunkt

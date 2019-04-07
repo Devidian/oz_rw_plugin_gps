@@ -1,6 +1,6 @@
 name: "Omega Zirkel GPS (com.vms.GPS)"
 main: de.omegazirkel.risingworld.GPS
-version: 1.5.1
+version: 1.6.0-SNAPSHOT
 author: "Maik 'Devidian' Laschober"
 team: "Omega Zirkel"
 description: "GPS Plugin, originally written by Miwarre"

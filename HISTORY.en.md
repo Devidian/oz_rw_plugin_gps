@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+### Fixed
+- PluginChangeWatcher was not executed
+### Added
+- new command: `/gps spawn` teleport to your bed (player-spawn)
+- new command: `/gps serverspawn` teleport to server-spawn (default spawn)
+- new commands can be activated in `settings.properties`
+- Russian translation by `Galochka`
+
 ## [1.5.1] - 2019-04-06
 ### Added
 - `/gps help` now shows commands for teleport and set home
