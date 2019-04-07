@@ -29,6 +29,8 @@ ____________________
 |/gps help|Show available commands|
 |/gps info|Show Plugin description & Credits|
 |/gps status|Show plugin version, language etc.|
+|/gps spawn|Teleport to your spawn (bed) location|
+|/gps serverspawn|Teleport to server-default spawn location (new player spawn)|
 |/hsethome|shortcut to set your home to your current location|
 |/home|teleport to your home location|
 
