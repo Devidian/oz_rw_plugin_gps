@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+## [1.6.0] - 2019-04-07
 ### Fixed
 - PluginChangeWatcher was not executed
 ### Added
