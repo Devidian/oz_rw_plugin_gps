@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.6.1] - 2019-04-09
+## Fixed
+- Slot 15 (last slot in general) is now loaded correctly
+
 ## [1.6.0] - 2019-04-07
 ### Fixed
 - PluginChangeWatcher was not executed
@@ -23,4 +27,4 @@
 - class Msgs removed, now using i18n class from tools
 - class Db removed, now using Wrapper class SQLite from tools.db
 ### Fixed
-- UTF-8 bug from version 1.4.0 
+- UTF-8 bug from version 1.4.0

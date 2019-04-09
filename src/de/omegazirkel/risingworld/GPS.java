@@ -33,7 +33,7 @@ import net.risingworld.api.utils.Vector3f;
 
 public class GPS extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "1.6.0-SNAPSHOT";
+	static final String pluginVersion = "1.6.1";
 	static final String pluginName = "GPS";
 	static final String pluginCMD = "gps";
 
@@ -213,7 +213,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	/**
 	 * Loads from the DB the Home/way-point data for a player and caches them in
 	 * player attributes.
-	 * 
+	 *
 	 * @param player
 	 */
 	private void loadPlayer(Player player) {
@@ -223,7 +223,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 				"SELECT * FROM `waypoints` WHERE `player_id` = '" + player.getDbID() + "' ORDER BY `wp_id`;")) {
 			while (result.next()) {
 				int wpIdx = result.getInt("wp_id");
-				if (wpIdx < GPS.MIN_WP || wpIdx >= GPS.wpMaxIndex)
+				if (wpIdx < GPS.MIN_WP || wpIdx > GPS.wpMaxIndex)
 					continue;
 				waypoints[result.getInt("wp_id")] = new Waypoint(result.getInt("wp_id"), result.getString("wp_name"),
 						result.getFloat("wp_x"), result.getFloat("wp_y"), result.getFloat("wp_z"));
@@ -236,7 +236,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	/**
 	 * Inserts into the DB (or replace if already present) data for a way-point at
 	 * arbitrary position, also updating the player attribute cache.
-	 * 
+	 *
 	 * @param player
 	 * @param wpIndex
 	 * @param wpName
@@ -248,7 +248,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	/**
 	 * Inserts into the DB (or replace if already present) data for a way-point at
 	 * arbitrary position, also updating the player attribute cache.
-	 * 
+	 *
 	 * @param player
 	 * @param wpIdx
 	 * @param pos
@@ -300,7 +300,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	/**
 	 * Inserts into the DB (or replace if already present) Home data at current
 	 * player position, also updating the player attribute cache.
-	 * 
+	 *
 	 * @param player
 	 */
 	public void setHome(Player player) {
@@ -355,7 +355,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 
 	/**
 	 * Adds the given point to the list of targets for player 'player'
-	 * 
+	 *
 	 * @param player the player to whom add the target
 	 * @param x      the target x coordinate
 	 * @param y      the target y coordinate
@@ -376,7 +376,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 	/**
 	 * Tele-transports to the index-th way-point. The way-point must be defined and,
 	 * if different from Home, teleport to way-points must be enabled.
-	 * 
+	 *
 	 * @param player the affected player.
 	 * @param index  a int from 0 to 9 with the index of the way-point.
 	 */
@@ -406,7 +406,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 
 	/**
 	 * teleport the player to the server default spawn location
-	 * 
+	 *
 	 * @author Devidian
 	 * @param player
 	 */
@@ -425,7 +425,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 
 	/**
 	 * teleport the player to his bed
-	 * 
+	 *
 	 * @author Devidian
 	 * @param player
 	 */
@@ -443,7 +443,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 
 	/**
 	 * Sets the text of the player GPS data text.
-	 * 
+	 *
 	 * @param player the affected player
 	 */
 	void setGpsText(Player player) {

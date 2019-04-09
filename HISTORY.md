@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.6.1] - 2019-04-09
+### Fixed
+- Slot 15 (der letzte) wird nun korrekt geladen
+
 ## [1.6.0] - 2019-04-07
 ### Fixed
 - PluginChangeWatcher wurde nicht ausgeführt
