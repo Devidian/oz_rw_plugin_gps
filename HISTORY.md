@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.6.2] - 2019-04-10
+### Fixed
+- Slot 15 (der letzte) kann nun auch gelöscht werden
+
 ## [1.6.1] - 2019-04-09
 ### Fixed
 - Slot 15 (der letzte) wird nun korrekt geladen

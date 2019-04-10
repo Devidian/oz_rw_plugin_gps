@@ -33,7 +33,7 @@ import net.risingworld.api.utils.Vector3f;
 
 public class GPS extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "1.6.1";
+	static final String pluginVersion = "1.6.2";
 	static final String pluginName = "GPS";
 	static final String pluginCMD = "gps";
 
@@ -278,7 +278,7 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 
 	public void deleteWp(Player player, int wpIdx) {
 		String lang = player.getSystemLanguage();
-		if (wpIdx < GPS.MIN_WP || wpIdx >= GPS.wpMaxIndex) {
+		if (wpIdx < GPS.MIN_WP || wpIdx > GPS.wpMaxIndex) {
 			player.sendTextMessage(c.error + pluginName + ":> " + c.text
 					+ t.get("GPS_001", lang).replace("PH_MIN", MIN_WP + "").replace("PH_MAX", wpMaxIndex + ""));
 			return;
