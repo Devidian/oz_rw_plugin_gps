@@ -33,7 +33,7 @@ import net.risingworld.api.utils.Vector3f;
 
 public class GPS extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "1.6.2";
+	static final String pluginVersion = "1.7.0";
 	static final String pluginName = "GPS";
 	static final String pluginCMD = "gps";
 
@@ -193,8 +193,13 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 				player.sendTextMessage(c.okay + pluginName + ":> " + statusMessage);
 				break;
 			default:
-				player.sendTextMessage(c.error + pluginName + ":> " + c.text
-						+ t.get("MSG_CMD_ERR_UNKNOWN_OPTION", lang).replace("PH_OPTION", option));
+				try {
+					Integer index = Integer.parseInt(option);
+					teleportToWp(player, index);
+				} catch (NumberFormatException e) {
+					player.sendTextMessage(c.error + pluginName + ":> " + c.text
+							+ t.get("MSG_CMD_ERR_UNKNOWN_OPTION", lang).replace("PH_OPTION", option));
+				}
 				break;
 			}
 		}

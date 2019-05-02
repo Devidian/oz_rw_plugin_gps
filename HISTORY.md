@@ -1,34 +1,40 @@
 ## [Unreleased]
 
+## [1.7.0] - 2019-05-02
+### Added
+- new command `/gps [index]` teleports the player to his [index] waypoint
+### Changed
+- default language for *.md files is now English
+
 ## [1.6.2] - 2019-04-10
 ### Fixed
-- Slot 15 (der letzte) kann nun auch gelöscht werden
+- Slot 15 (last slot in general) can now be deleted
 
 ## [1.6.1] - 2019-04-09
-### Fixed
-- Slot 15 (der letzte) wird nun korrekt geladen
+## Fixed
+- Slot 15 (last slot in general) is now loaded correctly
 
 ## [1.6.0] - 2019-04-07
 ### Fixed
-- PluginChangeWatcher wurde nicht ausgeführt
+- PluginChangeWatcher was not executed
 ### Added
-- neues Kommando: `/gps spawn` teleportiert zum Bett (Spieler-Spawn)
-- neues Kommando: `/gps serverspawn` teleportiert zum Srver-Startpunkt
-- neue Kommandos können in der `settings.properties` aktiviert werden
-- Russische Übersetzung von `Galochka`
+- new command: `/gps spawn` teleport to your bed (player-spawn)
+- new command: `/gps serverspawn` teleport to server-spawn (default spawn)
+- new commands can be activated in `settings.properties`
+- Russian translation by `Galochka`
 
 ## [1.5.1] - 2019-04-06
 ### Added
-- In der Hilfe stehen nun auch die Befehle zum setzen und teleportieren zum Startpunkt
+- `/gps help` now shows commands for teleport and set home
 ### Changed
-- README.en.md aktualisiert, Tabelle mit Befehlen hinzugefügt
-- `wpMaxIndex` kann nun in `settings.properties` eingestellt werden (Anzahl der Waypoints pro Spieler)
+- README.en.md updated, added command table
+- `wpMaxIndex` can now be changed in `settings.properties` (maximum number of waypoints)
 
 ## [1.5.0] - 2019-04-06
 ### Changed
-- Original Plugin nach Maven konvertiert und mit OZ Boilerplate zusammengelegt
-- deutsche Übersetzung angepasst
-- Klasse Msgs entfernt, verwendet nun i18n aus tools
-- Klasse Db entfernt, verwendet nun Wrapper Klasse SQLite aus tools.db
+- original plugin converted to maven, merged with oz-boilerplate
+- updated German translation
+- class Msgs removed, now using i18n class from tools
+- class Db removed, now using Wrapper class SQLite from tools.db
 ### Fixed
-- UTF-8 Bug aus Version 1.4.0 behoben
+- UTF-8 bug from version 1.4.0
