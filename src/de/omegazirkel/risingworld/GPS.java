@@ -2,7 +2,7 @@ package de.omegazirkel.risingworld;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+// import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -33,7 +33,7 @@ import net.risingworld.api.utils.Vector3f;
 
 public class GPS extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "1.7.0";
+	static final String pluginVersion = "1.7.1";
 	static final String pluginName = "GPS";
 	static final String pluginCMD = "gps";
 
@@ -93,12 +93,10 @@ public class GPS extends Plugin implements Listener, FileChangeListener {
 		initDatabase();
 
 		try {
-			PluginChangeWatcher WU = new PluginChangeWatcher(this);
 			File f = new File(getPath());
-			WU.watchDir(f);
-			WU.startListening();
-		} catch (IOException ex) {
-			log.out(ex.getMessage(), 999);
+			PluginChangeWatcher.registerFileChangeListener(this, f);
+		} catch (Exception ex) {
+			log.out(ex.toString(), 911);
 		}
 
 		log.out(pluginName + " Plugin is enabled", 10);

@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.7.1] - 2019-12-10
+### Fixed
+- Abhängigkeiten aktualisiert
+
 ## [1.7.0] - 2019-05-02
 ### Added
 - neues Kommando `/gps [index]` teleportiert den Spieler zu seinem [index] Wegpunkt

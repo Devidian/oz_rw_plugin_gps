@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.7.1] - 2019-12-10
+### Fixed
+- dependencies updated
+
 ## [1.7.0] - 2019-05-02
 ### Added
 - new command `/gps [index]` teleports the player to his [index] waypoint
